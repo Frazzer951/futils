@@ -3,12 +3,14 @@ authors     = ["Luke Eltiste"]
 description = "A collection of command line tool that I use to make my life easier"
 edition     = "2021"
 license     = "MIT"
-name        = "futils"
+name        = "frazzers-utils"
 readme      = "README.md"
 repository  = "https://github.com/Frazzer951/futils"
 version     = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "futils"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.4.6", features = ["derive"] }
