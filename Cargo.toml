@@ -1,7 +1,12 @@
 [package]
-name    = "futils"
-version = "0.1.0"
-edition = "2021"
+authors     = ["Luke Eltiste"]
+description = "A collection of command line tool that I use to make my life easier"
+edition     = "2021"
+license     = "MIT"
+name        = "futils"
+readme      = "README.md"
+repository  = "https://github.com/Frazzer951/futils"
+version     = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
