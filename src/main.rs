@@ -20,6 +20,12 @@ enum Commands {
 
         #[arg(short, long)]
         symbol: Option<char>,
+
+        #[arg(short, long)]
+        caps: bool,
+
+        #[arg(short, long)]
+        prefix: Option<String>,
     },
 }
 
@@ -31,8 +37,11 @@ fn main() {
             text,
             min_length,
             symbol,
+            caps,
+            prefix,
         }) => {
-            println!("{}", comment(text, *min_length, *symbol))
+            let text = if *caps { text.to_uppercase() } else { text.to_string() };
+            println!("{}", comment(&text, *min_length, *symbol, prefix.clone()))
         },
         None => {
             panic!("Unknown command")

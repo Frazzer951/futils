@@ -1,4 +1,4 @@
-pub fn comment(text: &str, min_len: Option<usize>, symbol: Option<char>) -> String {
+pub fn comment(text: &str, min_len: Option<usize>, symbol: Option<char>, prefix: Option<String>) -> String {
     let min_len = min_len.unwrap_or(10);
     let symbol = symbol.unwrap_or('*');
 
@@ -16,10 +16,16 @@ pub fn comment(text: &str, min_len: Option<usize>, symbol: Option<char>) -> Stri
     let symbols_each_side = (len - text.len() - 6) / 2;
 
     // Add the first line
+    if let Some(ref prefix) = prefix {
+        result.push_str(prefix);
+    }
     result.push_str(&symbol.to_string().repeat(len));
     result.push('\n');
 
     // Add the second line
+    if let Some(ref prefix) = prefix {
+        result.push_str(prefix);
+    }
     result.push_str(&symbol.to_string().repeat(symbols_each_side + 2)); // +1 for the '*' at the start
     result.push(' ');
     result.push_str(text);
@@ -28,6 +34,9 @@ pub fn comment(text: &str, min_len: Option<usize>, symbol: Option<char>) -> Stri
     result.push('\n');
 
     // Add the third line
+    if let Some(prefix) = prefix {
+        result.push_str(&prefix);
+    }
     result.push_str(&symbol.to_string().repeat(len));
 
     result
@@ -39,7 +48,7 @@ mod tests {
 
     #[test]
     fn test_comment() {
-        let result = comment("test", None, None);
+        let result = comment("test", None, None, None);
         let expected = "\
 **********
 ** test **
@@ -49,7 +58,7 @@ mod tests {
 
     #[test]
     fn test_comment_different_symbol() {
-        let result = comment("test", None, Some('#'));
+        let result = comment("test", None, Some('#'), None);
         let expected = "\
 ##########
 ## test ##
@@ -59,7 +68,7 @@ mod tests {
 
     #[test]
     fn test_comment_different_length() {
-        let result = comment("i", Some(7), None);
+        let result = comment("i", Some(7), None, None);
         let expected = "\
 *******
 ** i **
@@ -69,7 +78,7 @@ mod tests {
 
     #[test]
     fn test_comment_long() {
-        let result = comment("long comment test", None, None);
+        let result = comment("long comment test", None, None, None);
         let expected = "\
 ***********************
 ** long comment test **
@@ -79,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_comment_odd() {
-        let result = comment("one", None, None);
+        let result = comment("one", None, None, None);
         let expected = "\
 ***********
 *** one ***
@@ -89,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_comment_short() {
-        let result = comment("to", None, None);
+        let result = comment("to", None, None, None);
         let expected = "\
 **********
 *** to ***
@@ -99,11 +108,21 @@ mod tests {
 
     #[test]
     fn test_comment_long_odd() {
-        let result = comment("long comment tests", None, None);
+        let result = comment("long comment tests", None, None, None);
         let expected = "\
 ************************
 ** long comment tests **
 ************************";
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_comment_prefix() {
+        let result = comment("test", None, None, Some("-- ".to_string()));
+        let expected = "\
+-- **********
+-- ** test **
+-- **********";
         assert_eq!(result, expected);
     }
 }
