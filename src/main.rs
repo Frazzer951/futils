@@ -33,9 +33,9 @@ fn main() {
             symbol,
         }) => {
             println!("{}", comment(text, *min_length, *symbol))
-        }
+        },
         None => {
             panic!("Unknown command")
-        }
+        },
     }
 }
