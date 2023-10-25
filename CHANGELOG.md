@@ -1,4 +1,11 @@
 # Changelog
+## [0.1.2] - 2023-10-25
+
+### Continuous Integration
+
+- Create Release PR action
+- Use `install-action` for both dependencies
+
 ## [0.1.1] - 2023-10-24
 
 ### Continuous Integration
