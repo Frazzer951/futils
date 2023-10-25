@@ -36,4 +36,4 @@ pr-run-mode = "plan"
 # Config for 'cargo release'
 [workspace.metadata.release]
 pre-release-commit-message = "chore(release): prepare for release {{version}}"
-pre-release-hook           = ["git", "cliff", "-o", "CHANGELOG.md", "--tag", "{{version}}"]
+pre-release-hook           = ["./update_version.sh", "{{version}}"]
