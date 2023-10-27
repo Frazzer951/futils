@@ -8,9 +8,6 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "direct"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
     commit-message:
       prefix: "chore:"
     assignees:
