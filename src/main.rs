@@ -1,7 +1,10 @@
 mod comment;
+mod format_json;
 
+use anyhow::{bail, Result};
 use clap::{Parser, Subcommand};
 use comment::comment;
+use format_json::format_json_file;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -27,9 +30,12 @@ enum Commands {
         #[arg(short, long)]
         prefix: Option<String>,
     },
+    FormatJson {
+        filename: String,
+    },
 }
 
-fn main() {
+fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
@@ -43,8 +49,13 @@ fn main() {
             let text = if *caps { text.to_uppercase() } else { text.to_string() };
             println!("{}", comment(&text, *min_length, *symbol, prefix.clone()))
         },
+        Some(Commands::FormatJson { filename }) => {
+            format_json_file(filename)?;
+        },
         None => {
-            panic!("Unknown command")
+            bail!("Unknown command")
         },
     }
+
+    Ok(())
 }
