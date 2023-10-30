@@ -32,6 +32,9 @@ enum Commands {
     },
     FormatJson {
         filename: String,
+
+        #[arg(short, long)]
+        output: Option<String>,
     },
 }
 
@@ -49,8 +52,8 @@ fn main() -> Result<()> {
             let text = if *caps { text.to_uppercase() } else { text.to_string() };
             println!("{}", comment(&text, *min_length, *symbol, prefix.clone()))
         },
-        Some(Commands::FormatJson { filename }) => {
-            format_json_file(filename)?;
+        Some(Commands::FormatJson { filename, output }) => {
+            format_json_file(filename, output.as_deref())?;
         },
         None => {
             bail!("Unknown command")
