@@ -1,4 +1,23 @@
 # Changelog
+## [0.1.2] - 2023-10-30
+
+### Continuous Integration
+
+- Create Release PR action
+- Use `install-action` for both dependencies
+- Cargo Release Script
+- Update dependabot.yml
+
+### Features
+
+- Format Json Files
+- Json Format output file
+
+### Miscellaneous Tasks
+
+- Remove automated release
+- Add help comments to options
+
 ## [0.1.1] - 2023-10-24
 
 ### Continuous Integration
