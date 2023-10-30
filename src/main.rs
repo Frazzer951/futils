@@ -18,22 +18,22 @@ enum Commands {
     Comment {
         text: String,
 
-        #[arg(short, long)]
+        #[arg(short, long, help = "Minimum length for the comment.")]
         min_length: Option<usize>,
 
-        #[arg(short, long)]
+        #[arg(short, long, help = "Symbol to use for the comment.")]
         symbol: Option<char>,
 
-        #[arg(short, long)]
+        #[arg(short, long, help = "Convert the comment to uppercase.")]
         caps: bool,
 
-        #[arg(short, long)]
+        #[arg(short, long, help = "Prefix to use for the comment.")]
         prefix: Option<String>,
     },
     FormatJson {
         filename: String,
 
-        #[arg(short, long)]
+        #[arg(short, long, help = "Optional output filename to write the formatted JSON.")]
         output: Option<String>,
     },
 }
