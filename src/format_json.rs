@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use fs_err as fs;
 use serde_json::{Map, Value};
 
-pub fn format_json_file(filename: &str, output_filename: Option<&str>) -> Result<()> {
+pub fn format_json_file(filename: &str, output_filename: Option<&str>, sort: bool) -> Result<()> {
     // Read the file
     let data = fs::read_to_string(filename).context("Failed to read the file")?;
 
@@ -10,8 +10,10 @@ pub fn format_json_file(filename: &str, output_filename: Option<&str>) -> Result
     let mut json_value: Value = serde_json::from_str(&data).context("Failed to parse JSON")?;
 
     // Sort keys if it's a map
-    if let Value::Object(map) = &mut json_value {
-        sort_map(map);
+    if sort {
+        if let Value::Object(map) = &mut json_value {
+            sort_map(map);
+        }
     }
 
     // Write the formatted JSON data back to the file
