@@ -41,3 +41,92 @@ fn sort_map(map: &mut Map<String, Value>) {
         map.insert(k, v);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::{Read, Write};
+    use std::path::Path;
+    use tempfile::NamedTempFile;
+
+    fn setup_test_file(data: &str) -> NamedTempFile {
+        let mut file = NamedTempFile::new().expect("Failed to create test file");
+        file.write_all(data.as_bytes()).expect("Failed to write to test file");
+        file
+    }
+
+    fn read_file(path: &Path) -> std::io::Result<String> {
+        let mut file = File::open(path)?;
+        let mut content = String::new();
+        file.read_to_string(&mut content)?;
+        Ok(content)
+    }
+
+    #[test]
+    fn test_valid_json() {
+        let file = setup_test_file(r#"{"key": "value"}"#);
+        let result = format_json_file(file.path().to_str().unwrap(), None, false);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_invalid_json() {
+        let file = setup_test_file(r#"{"key": "value""#);
+        let result = format_json_file(file.path().to_str().unwrap(), None, false);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_sort_json() {
+        let file = setup_test_file(r#"{"b": "2", "a": "1"}"#);
+        let _ = format_json_file(file.path().to_str().unwrap(), None, true).unwrap();
+
+        let sorted_data = read_file(file.path()).expect("Failed to read the file");
+        assert_eq!(
+            sorted_data,
+            r#"{
+  "a": "1",
+  "b": "2"
+}"#
+        );
+    }
+
+    #[test]
+    fn test_nested_json() {
+        let file = setup_test_file(r#"{"a": {"c": "3", "b": "2"}}"#);
+        let _ = format_json_file(file.path().to_str().unwrap(), None, true).unwrap();
+
+        let sorted_data = read_file(file.path()).expect("Failed to read the file");
+        assert_eq!(
+            sorted_data,
+            r#"{
+  "a": {
+    "b": "2",
+    "c": "3"
+  }
+}"#
+        );
+    }
+
+    #[test]
+    fn test_output_file() {
+        let input_file = setup_test_file(r#"{"key": "value"}"#);
+        let mut output_file = NamedTempFile::new().expect("Failed to create output test file");
+        let _ = format_json_file(
+            input_file.path().to_str().unwrap(),
+            Some(output_file.path().to_str().unwrap()),
+            false,
+        )
+        .unwrap();
+
+        let mut output_data = String::new();
+        output_file.read_to_string(&mut output_data).unwrap();
+        assert_eq!(
+            output_data,
+            r#"{
+  "key": "value"
+}"#
+        );
+    }
+}
