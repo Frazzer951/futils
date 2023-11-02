@@ -1,4 +1,18 @@
 # Changelog
+## [0.2.0] - 2023-11-02
+
+### Features
+
+- Optional Sorting on Json Files
+
+### Refactor
+
+- Use Clap Builder instead of Derive
+
+### Testing
+
+- Json Format Tests
+
 ## [0.1.2] - 2023-10-30
 
 ### Continuous Integration
