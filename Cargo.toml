@@ -13,11 +13,12 @@ name = "futils"
 path = "src/main.rs"
 
 [dependencies]
-anyhow     = "1.0"
-clap       = { version = "4.4", features = ["derive"] }
-fs-err     = "2.9"
-serde      = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+anyhow        = "1.0"
+clap          = { version = "4.4", features = ["cargo"] }
+clap_complete = "4.4"
+fs-err        = "2.9"
+serde         = { version = "1.0", features = ["derive"] }
+serde_json    = "1.0"
 
 [dev-dependencies]
 tempfile = "3.8"

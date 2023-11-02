@@ -1,17 +1,19 @@
 use crate::{comment::comment, format_json::format_json_file};
 use anyhow::{bail, Result};
 use clap::{command, value_parser, Arg, ArgAction, Command};
+use clap_complete::{generate, Generator, Shell};
+use std::io;
 
 fn cli() -> Command {
-    command!()
+    command!("futils")
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .subcommands(vec![subcommand_comment(), subcommand_format_json()])
+        .subcommands(vec![subcommand_comment(), subcommand_format_json(), subcommand_generator()])
 }
 
 fn subcommand_comment() -> Command {
     Command::new("comment").about("Create a comment").args(&[
-        Arg::new("text").required(true).index(1).help("Text for the comment"),
+        Arg::new("text").required(true).help("Text for the comment"),
         Arg::new("min_length")
             .short('m')
             .long("min-length")
@@ -35,10 +37,7 @@ fn subcommand_comment() -> Command {
 
 fn subcommand_format_json() -> Command {
     Command::new("format-json").about("Format a JSON file").args(&[
-        Arg::new("filename")
-            .required(true)
-            .index(1)
-            .help("Filename of the JSON to format"),
+        Arg::new("filename").required(true).help("Filename of the JSON to format"),
         Arg::new("output")
             .short('o')
             .long("output")
@@ -49,6 +48,17 @@ fn subcommand_format_json() -> Command {
             .help("Sort the JSON keys.")
             .action(ArgAction::SetTrue),
     ])
+}
+
+fn subcommand_generator() -> Command {
+    Command::new("generate")
+        .about("Generate Shell Completions")
+        .after_help("Example Usage: futils generate zsh > ~/.completions/_futils")
+        .args(&[Arg::new("shell")
+            .required(true)
+            .help("The shell to generate completions for.")
+            .action(ArgAction::Set)
+            .value_parser(value_parser!(Shell))])
 }
 
 pub fn parse() -> Result<()> {
@@ -72,6 +82,12 @@ pub fn parse() -> Result<()> {
 
             format_json_file(filename, output, sort)?;
         },
+        Some(("generate", sub_matches)) => {
+            let generator = sub_matches.get_one::<Shell>("shell").unwrap();
+            let mut cmd = cli();
+            eprintln!("Generating completion file for {generator}...");
+            print_completions(*generator, &mut cmd);
+        },
         Some((command, _)) => {
             bail!("Code has not yet been written for `{command}`");
         },
@@ -79,4 +95,8 @@ pub fn parse() -> Result<()> {
     }
 
     Ok(())
+}
+
+fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
