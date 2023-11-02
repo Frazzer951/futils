@@ -35,6 +35,9 @@ enum Commands {
 
         #[arg(short, long, help = "Optional output filename to write the formatted JSON.")]
         output: Option<String>,
+
+        #[arg(short, long, help = "Sort the JSON keys.")]
+        sort: bool,
     },
 }
 
@@ -52,8 +55,8 @@ fn main() -> Result<()> {
             let text = if *caps { text.to_uppercase() } else { text.to_string() };
             println!("{}", comment(&text, *min_length, *symbol, prefix.clone()))
         },
-        Some(Commands::FormatJson { filename, output }) => {
-            format_json_file(filename, output.as_deref())?;
+        Some(Commands::FormatJson { filename, output, sort }) => {
+            format_json_file(filename, output.as_deref(), *sort)?;
         },
         None => {
             bail!("Unknown command")
