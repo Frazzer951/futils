@@ -2,9 +2,9 @@ use anyhow::{Context, Result};
 use fs_err as fs;
 use serde_json::{Map, Value};
 
-pub fn format_json_file(filename: &str, output_filename: Option<&str>, sort: bool) -> Result<()> {
+pub fn format_json_file(filename: String, output_filename: Option<String>, sort: bool) -> Result<()> {
     // Read the file
-    let data = fs::read_to_string(filename).context("Failed to read the file")?;
+    let data = fs::read_to_string(&filename).context("Failed to read the file")?;
 
     // Parse the JSON data
     let mut json_value: Value = serde_json::from_str(&data).context("Failed to parse JSON")?;
@@ -66,21 +66,21 @@ mod tests {
     #[test]
     fn test_valid_json() {
         let file = setup_test_file(r#"{"key": "value"}"#);
-        let result = format_json_file(file.path().to_str().unwrap(), None, false);
+        let result = format_json_file(file.path().to_str().unwrap().into(), None, false);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_invalid_json() {
         let file = setup_test_file(r#"{"key": "value""#);
-        let result = format_json_file(file.path().to_str().unwrap(), None, false);
+        let result = format_json_file(file.path().to_str().unwrap().into(), None, false);
         assert!(result.is_err());
     }
 
     #[test]
     fn test_sort_json() {
         let file = setup_test_file(r#"{"b": "2", "a": "1"}"#);
-        let _ = format_json_file(file.path().to_str().unwrap(), None, true).unwrap();
+        let _ = format_json_file(file.path().to_str().unwrap().into(), None, true).unwrap();
 
         let sorted_data = read_file(file.path()).expect("Failed to read the file");
         assert_eq!(
@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn test_nested_json() {
         let file = setup_test_file(r#"{"a": {"c": "3", "b": "2"}}"#);
-        let _ = format_json_file(file.path().to_str().unwrap(), None, true).unwrap();
+        let _ = format_json_file(file.path().to_str().unwrap().into(), None, true).unwrap();
 
         let sorted_data = read_file(file.path()).expect("Failed to read the file");
         assert_eq!(
@@ -114,8 +114,8 @@ mod tests {
         let input_file = setup_test_file(r#"{"key": "value"}"#);
         let mut output_file = NamedTempFile::new().expect("Failed to create output test file");
         let _ = format_json_file(
-            input_file.path().to_str().unwrap(),
-            Some(output_file.path().to_str().unwrap()),
+            input_file.path().to_str().unwrap().into(),
+            Some(output_file.path().to_str().unwrap().into()),
             false,
         )
         .unwrap();
