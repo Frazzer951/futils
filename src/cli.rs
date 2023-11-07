@@ -1,6 +1,6 @@
 use crate::{comment::comment, format_json::format_json_file};
 use anyhow::{bail, Result};
-use clap::{command, value_parser, Arg, ArgAction, Command};
+use clap::{command, value_parser, Arg, ArgAction, Command, ValueHint};
 use clap_complete::{generate, Generator, Shell};
 use std::io;
 
@@ -37,11 +37,15 @@ fn subcommand_comment() -> Command {
 
 fn subcommand_format_json() -> Command {
     Command::new("format-json").about("Format a JSON file").args(&[
-        Arg::new("filename").required(true).help("Filename of the JSON to format"),
+        Arg::new("filename")
+            .required(true)
+            .help("Filename of the JSON to format")
+            .value_hint(ValueHint::AnyPath),
         Arg::new("output")
             .short('o')
             .long("output")
-            .help("Optional output filename to write the formatted JSON."),
+            .help("Optional output filename to write the formatted JSON.")
+            .value_hint(ValueHint::AnyPath),
         Arg::new("sort")
             .short('s')
             .long("sort")
