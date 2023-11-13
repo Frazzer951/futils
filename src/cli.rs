@@ -17,7 +17,8 @@ fn subcommand_comment() -> Command {
         Arg::new("min_length")
             .short('m')
             .long("min-length")
-            .help("Minimum length for the comment."),
+            .help("Minimum length for the comment.")
+            .value_parser(value_parser!(usize)),
         Arg::new("symbol")
             .short('s')
             .long("symbol")
