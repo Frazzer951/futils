@@ -1,4 +1,7 @@
-use crate::{comment::comment, format_json::format_json_file};
+use crate::{
+    comment::comment,
+    format_json::{format_json_file, FormatJsonConfig},
+};
 use anyhow::{bail, Result};
 use clap::{command, value_parser, Arg, ArgAction, Command, ValueHint};
 use clap_complete::{generate, Generator, Shell};
@@ -42,6 +45,11 @@ fn subcommand_format_json() -> Command {
             .required(true)
             .help("Filename of the JSON to format")
             .value_hint(ValueHint::AnyPath),
+        Arg::new("indent")
+            .short('t')
+            .long("indent")
+            .help("Indent size to use for the formatted JSON.")
+            .value_parser(value_parser!(usize)),
         Arg::new("output")
             .short('o')
             .long("output")
@@ -51,6 +59,11 @@ fn subcommand_format_json() -> Command {
             .short('s')
             .long("sort")
             .help("Sort the JSON keys.")
+            .action(ArgAction::SetTrue),
+        Arg::new("in-place")
+            .short('i')
+            .long("in-place")
+            .help("Format the file in-place.")
             .action(ArgAction::SetTrue),
     ])
 }
@@ -82,10 +95,25 @@ pub fn parse() -> Result<()> {
         },
         Some(("format-json", sub_matches)) => {
             let filename = sub_matches.get_one::<String>("filename").unwrap().clone();
+            let indent = sub_matches.get_one::<usize>("indent").cloned();
             let output = sub_matches.get_one::<String>("output").cloned();
             let sort = sub_matches.get_flag("sort");
+            let in_place = sub_matches.get_flag("in-place");
 
-            format_json_file(filename, output, sort)?;
+            let should_print = output.is_none() && !in_place;
+
+            let json_config = FormatJsonConfig {
+                filename,
+                output_filename: output,
+                indent_size: indent,
+                sort,
+                in_place,
+            };
+
+            let formatted_json = format_json_file(json_config)?;
+            if should_print {
+                println!("{}", formatted_json);
+            }
         },
         Some(("generate", sub_matches)) => {
             let generator = sub_matches.get_one::<Shell>("shell").unwrap();

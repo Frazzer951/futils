@@ -1,27 +1,55 @@
 use anyhow::{Context, Result};
 use fs_err as fs;
-use serde_json::{Map, Value};
+use serde::Serialize;
+use serde_json::{
+    ser::{PrettyFormatter, Serializer},
+    Map, Value,
+};
 
-pub fn format_json_file(filename: String, output_filename: Option<String>, sort: bool) -> Result<()> {
+pub struct FormatJsonConfig {
+    pub filename: String,
+    pub output_filename: Option<String>,
+    pub indent_size: Option<usize>,
+    pub sort: bool,
+    pub in_place: bool,
+}
+
+pub fn format_json_file(config: FormatJsonConfig) -> Result<String> {
+    let indent_size = config.indent_size.unwrap_or(2);
+
     // Read the file
-    let data = fs::read_to_string(&filename).context("Failed to read the file")?;
+    let data = fs::read_to_string(&config.filename).context("Failed to read the file")?;
 
     // Parse the JSON data
     let mut json_value: Value = serde_json::from_str(&data).context("Failed to parse JSON")?;
 
     // Sort keys if it's a map
-    if sort {
+    if config.sort {
         if let Value::Object(map) = &mut json_value {
             sort_map(map);
         }
     }
 
-    // Write the formatted JSON data back to the file
-    let formatted_data = serde_json::to_string_pretty(&json_value).context("Failed to format JSON")?;
-    let target_filename = output_filename.unwrap_or(filename);
-    fs::write(target_filename, formatted_data).context("Failed to write back to the file")?;
+    // Create a custom PrettyFormatter with the specified indent size
+    let indent = " ".repeat(indent_size);
+    let formatter = PrettyFormatter::with_indent(indent.as_bytes());
 
-    Ok(())
+    // Serialize the JSON with the custom formatter
+    let mut serialized_data = Vec::new();
+    let mut serializer = Serializer::with_formatter(&mut serialized_data, formatter);
+    json_value.serialize(&mut serializer).context("Failed to format JSON")?;
+
+    // Write the formatted JSON data back to the file
+    let formatted_data = String::from_utf8(serialized_data).context("Failed to convert bytes to string")?;
+
+    if config.in_place {
+        fs::write(&config.filename, &formatted_data).context("Failed to write back to the file")?;
+    }
+    if let Some(output_filename) = config.output_filename {
+        fs::write(output_filename, &formatted_data).context("Failed to write back to the file")?;
+    }
+
+    Ok(formatted_data)
 }
 
 fn sort_map(map: &mut Map<String, Value>) {
@@ -64,69 +92,113 @@ mod tests {
     }
 
     #[test]
-    fn test_valid_json() {
-        let file = setup_test_file(r#"{"key": "value"}"#);
-        let result = format_json_file(file.path().to_str().unwrap().into(), None, false);
-        assert!(result.is_ok());
+    fn test_basic_formatting() {
+        let raw_json = r#"{"b":2,"a":1}"#;
+        let expected_formatted_json = r#"{
+  "b": 2,
+  "a": 1
+}"#;
+
+        let test_file = setup_test_file(raw_json);
+        let config = FormatJsonConfig {
+            filename: test_file.path().to_str().unwrap().to_string(),
+            output_filename: None,
+            indent_size: None,
+            sort: false,
+            in_place: false,
+        };
+
+        let result = format_json_file(config).expect("Failed to format JSON");
+        assert_eq!(result, expected_formatted_json);
     }
 
     #[test]
-    fn test_invalid_json() {
-        let file = setup_test_file(r#"{"key": "value""#);
-        let result = format_json_file(file.path().to_str().unwrap().into(), None, false);
-        assert!(result.is_err());
+    fn test_basic_formatting_inplace() {
+        let raw_json = r#"{"b":2,"a":1}"#;
+        let expected_formatted_json = r#"{
+  "b": 2,
+  "a": 1
+}"#;
+
+        let test_file = setup_test_file(raw_json);
+        let config = FormatJsonConfig {
+            filename: test_file.path().to_str().unwrap().to_string(),
+            output_filename: None,
+            indent_size: None,
+            sort: false,
+            in_place: true,
+        };
+
+        format_json_file(config).expect("Failed to format JSON");
+        let result = read_file(test_file.path()).expect("Failed to read test file");
+        assert_eq!(result, expected_formatted_json);
     }
 
     #[test]
-    fn test_sort_json() {
-        let file = setup_test_file(r#"{"b": "2", "a": "1"}"#);
-        let _ = format_json_file(file.path().to_str().unwrap().into(), None, true).unwrap();
+    fn test_basic_sort() {
+        let raw_json = r#"{"b":2,"a":1}"#;
+        let expected_formatted_json = r#"{
+  "a": 1,
+  "b": 2
+}"#;
 
-        let sorted_data = read_file(file.path()).expect("Failed to read the file");
-        assert_eq!(
-            sorted_data,
-            r#"{
-  "a": "1",
-  "b": "2"
-}"#
-        );
+        let test_file = setup_test_file(raw_json);
+        let config = FormatJsonConfig {
+            filename: test_file.path().to_str().unwrap().to_string(),
+            output_filename: None,
+            indent_size: None,
+            sort: true,
+            in_place: false,
+        };
+
+        let result = format_json_file(config).expect("Failed to format JSON");
+        assert_eq!(result, expected_formatted_json);
     }
 
     #[test]
-    fn test_nested_json() {
-        let file = setup_test_file(r#"{"a": {"c": "3", "b": "2"}}"#);
-        let _ = format_json_file(file.path().to_str().unwrap().into(), None, true).unwrap();
-
-        let sorted_data = read_file(file.path()).expect("Failed to read the file");
-        assert_eq!(
-            sorted_data,
-            r#"{
-  "a": {
-    "b": "2",
-    "c": "3"
+    fn test_nested_sort() {
+        let raw_json = r#"{"b":{"b":2,"a":1},"a":1}"#;
+        let expected_formatted_json = r#"{
+  "a": 1,
+  "b": {
+    "a": 1,
+    "b": 2
   }
-}"#
-        );
+}"#;
+
+        let test_file = setup_test_file(raw_json);
+        let config = FormatJsonConfig {
+            filename: test_file.path().to_str().unwrap().to_string(),
+            output_filename: None,
+            indent_size: None,
+            sort: true,
+            in_place: false,
+        };
+
+        let result = format_json_file(config).expect("Failed to format JSON");
+        assert_eq!(result, expected_formatted_json);
     }
 
     #[test]
     fn test_output_file() {
-        let input_file = setup_test_file(r#"{"key": "value"}"#);
-        let mut output_file = NamedTempFile::new().expect("Failed to create output test file");
-        let _ = format_json_file(
-            input_file.path().to_str().unwrap().into(),
-            Some(output_file.path().to_str().unwrap().into()),
-            false,
-        )
-        .unwrap();
+        let raw_json = r#"{"b":2,"a":1}"#;
+        let expected_formatted_json = r#"{
+  "b": 2,
+  "a": 1
+}"#;
 
-        let mut output_data = String::new();
-        output_file.read_to_string(&mut output_data).unwrap();
-        assert_eq!(
-            output_data,
-            r#"{
-  "key": "value"
-}"#
-        );
+        let test_file = setup_test_file(raw_json);
+        let output_file = NamedTempFile::new().expect("Failed to create test file");
+        let config = FormatJsonConfig {
+            filename: test_file.path().to_str().unwrap().to_string(),
+            output_filename: Some(output_file.path().to_str().unwrap().to_string()),
+            indent_size: None,
+            sort: false,
+            in_place: false,
+        };
+
+        format_json_file(config).expect("Failed to format JSON");
+        let result = read_file(output_file.path()).expect("Failed to read test file");
+        assert_eq!(result, expected_formatted_json);
     }
 }

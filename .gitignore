@@ -19,3 +19,4 @@ Cargo.lock
 
 # Coverage Files
 cobertura.xml
+tarpaulin-report.html
