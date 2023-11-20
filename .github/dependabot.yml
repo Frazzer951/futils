@@ -27,7 +27,6 @@ updates:
       prefix: "chore:"
     assignees:
       - "frazzer951"
-    versioning-strategy: "increase-if-necessary"
     groups:
       github-actions:
         patterns:
