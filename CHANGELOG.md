@@ -1,4 +1,24 @@
 # Changelog
+## [0.2.1] - 2023-11-20
+
+### Bug Fixes
+
+- Value parse min-length to fix conversion error
+- Fix dependabot config
+
+### Continuous Integration
+
+- Update dependabot config
+- Tarpaulin config
+
+### Miscellaneous Tasks
+
+- Add type hint to path for autocomplete
+
+### Refactor
+
+- Refactor and cleanup format_json
+
 ## [0.2.0] - 2023-11-02
 
 ### Features
