@@ -14,8 +14,8 @@ updates:
       - "frazzer951"
     groups:
       cargo:
-        update-types:
-          - "minor"
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -27,7 +27,8 @@ updates:
       prefix: "chore:"
     assignees:
       - "frazzer951"
+    versioning-strategy: "increase-if-necessary"
     groups:
       github-actions:
-        update-types:
-          - "minor"
+        patterns:
+          - "*"
