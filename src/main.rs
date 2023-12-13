@@ -1,6 +1,7 @@
 mod cli;
 mod comment;
 mod format_json;
+mod format_sql;
 
 use anyhow::Result;
 

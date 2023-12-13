@@ -1,6 +1,7 @@
 use crate::{
     comment::comment,
     format_json::{format_json_file, FormatJsonConfig},
+    format_sql::format_sql_query,
 };
 use anyhow::{bail, Result};
 use clap::{command, value_parser, Arg, ArgAction, Command, ValueHint};
@@ -11,7 +12,12 @@ fn cli() -> Command {
     command!("futils")
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .subcommands(vec![subcommand_comment(), subcommand_format_json(), subcommand_generator()])
+        .subcommands(vec![
+            subcommand_comment(),
+            subcommand_format_json(),
+            subcommand_generator(),
+            subcommand_format_sql(),
+        ])
 }
 
 fn subcommand_comment() -> Command {
@@ -68,6 +74,12 @@ fn subcommand_format_json() -> Command {
     ])
 }
 
+fn subcommand_format_sql() -> Command {
+    Command::new("format-sql")
+        .about("Format a SQL query")
+        .args(&[Arg::new("query").required(true).help("SQL query to format")])
+}
+
 fn subcommand_generator() -> Command {
     Command::new("generate")
         .about("Generate Shell Completions")
@@ -114,6 +126,13 @@ pub fn parse() -> Result<()> {
             if should_print {
                 println!("{}", formatted_json);
             }
+        },
+        Some(("format-sql", sub_matches)) => {
+            let sql_query = sub_matches.get_one::<String>("query").unwrap().clone();
+
+            let formatted_sql = format_sql_query(sql_query)?;
+
+            println!("{}", formatted_sql);
         },
         Some(("generate", sub_matches)) => {
             let generator = sub_matches.get_one::<Shell>("shell").unwrap();

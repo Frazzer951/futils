@@ -10,9 +10,9 @@ version     = "0.2.1"
 
 [package.metadata.wix]
 upgrade-guid = "808C8A18-6A7E-4D28-88F4-5423B5B89A3C"
-path-guid = "1F39F219-9EE9-47EE-BEE5-E50079651B34"
-license = false
-eula = false
+path-guid    = "1F39F219-9EE9-47EE-BEE5-E50079651B34"
+license      = false
+eula         = false
 
 [[bin]]
 name = "futils"
@@ -25,6 +25,7 @@ clap_complete = "4.4"
 fs-err        = "2.9"
 serde         = { version = "1.0", features = ["derive"] }
 serde_json    = { version = "1.0", features = ["preserve_order"] }
+sqlparse      = "0.3"
 
 [dev-dependencies]
 tempfile = "3.8"
@@ -43,7 +44,13 @@ ci = ["github"]
 # The installers to generate for each app
 installers = ["shell", "powershell", "msi"]
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-musl", "x86_64-pc-windows-msvc"]
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-unknown-linux-musl",
+    "x86_64-pc-windows-msvc",
+]
 # Publish jobs to run in CI
 pr-run-mode = "plan"
 
