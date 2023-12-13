@@ -1,4 +1,20 @@
 # Changelog
+## [0.3.0] - 2023-12-13
+
+### Continuous Integration
+
+- Update cargo dist
+- Add installers
+- Update cargo dist
+
+### Documentation
+
+- Fix RELEASE.md typo
+
+### Features
+
+- Format sql
+
 ## [0.2.1] - 2023-11-20
 
 ### Bug Fixes
