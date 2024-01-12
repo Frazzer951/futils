@@ -1,4 +1,10 @@
 # Changelog
+## [0.3.1] - 2024-01-12
+
+### Continuous Integration
+
+- Update cargo dist
+
 ## [0.3.0] - 2023-12-13
 
 ### Continuous Integration
