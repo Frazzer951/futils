@@ -15,14 +15,18 @@ fn cli() -> Command {
         .subcommands(vec![
             subcommand_comment(),
             subcommand_format_json(),
-            subcommand_generator(),
             subcommand_format_sql(),
+            subcommand_generator(),
         ])
 }
 
 fn subcommand_comment() -> Command {
     Command::new("comment").about("Create a comment").args(&[
         Arg::new("text").required(true).help("Text for the comment"),
+        Arg::new("min_symbols")
+            .long("min-symbols")
+            .help("Minimum number of symbols to wrap the comment with.")
+            .value_parser(value_parser!(usize)),
         Arg::new("min_length")
             .short('m')
             .long("min-length")
@@ -41,6 +45,10 @@ fn subcommand_comment() -> Command {
             .short('c')
             .long("caps")
             .help("Convert the comment to uppercase.")
+            .action(ArgAction::SetTrue),
+        Arg::new("pad_with_symbol")
+            .long("pad")
+            .help("Wether or not to pad the comment with the symbol.")
             .action(ArgAction::SetTrue),
     ])
 }
@@ -97,13 +105,15 @@ pub fn parse() -> Result<()> {
     match matches.subcommand() {
         Some(("comment", sub_matches)) => {
             let text = sub_matches.get_one::<String>("text").unwrap().clone();
+            let min_symbols = sub_matches.get_one::<usize>("min_symbols").cloned();
             let min_length = sub_matches.get_one::<usize>("min_length").cloned();
             let symbol = sub_matches.get_one::<char>("symbol").cloned();
             let prefix = sub_matches.get_one::<String>("prefix").cloned();
             let caps = sub_matches.get_flag("caps");
+            let pad_with_symbol = sub_matches.get_flag("pad_with_symbol");
 
             let text = if caps { text.to_uppercase() } else { text };
-            println!("{}", comment(&text, min_length, symbol, prefix))
+            println!("{}", comment(&text, min_symbols, min_length, symbol, prefix, pad_with_symbol))
         },
         Some(("format-json", sub_matches)) => {
             let filename = sub_matches.get_one::<String>("filename").unwrap().clone();
