@@ -1,4 +1,11 @@
 # Changelog
+## [0.3.2] - 2024-01-13
+
+### Features
+
+- Add more options to better configure comment generation
+- Add missing short values
+
 ## [0.3.1] - 2024-01-12
 
 ### Continuous Integration
