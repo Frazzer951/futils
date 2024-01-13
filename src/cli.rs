@@ -24,6 +24,7 @@ fn subcommand_comment() -> Command {
     Command::new("comment").about("Create a comment").args(&[
         Arg::new("text").required(true).help("Text for the comment"),
         Arg::new("min_symbols")
+            .short('y')
             .long("min-symbols")
             .help("Minimum number of symbols to wrap the comment with.")
             .value_parser(value_parser!(usize)),
@@ -47,6 +48,7 @@ fn subcommand_comment() -> Command {
             .help("Convert the comment to uppercase.")
             .action(ArgAction::SetTrue),
         Arg::new("pad_with_symbol")
+            .short('d')
             .long("pad")
             .help("Wether or not to pad the comment with the symbol.")
             .action(ArgAction::SetTrue),
