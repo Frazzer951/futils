@@ -61,4 +61,4 @@ publish-jobs = ["homebrew"]
 # Config for 'cargo release'
 [workspace.metadata.release]
 pre-release-commit-message = "chore(release): prepare for release {{version}}"
-pre-release-hook           = ["./update_version.sh", "{{version}}"]
+pre-release-hook           = ["./release.sh.sh", "{{version}}"]
