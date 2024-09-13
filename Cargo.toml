@@ -38,7 +38,7 @@ lto      = "thin"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.14.1"
+cargo-dist-version = "0.22.1"
 # CI backends to support
 ci = "github"
 # The installers to generate for each app
@@ -51,7 +51,7 @@ targets = [
     "x86_64-unknown-linux-musl",
     "x86_64-pc-windows-msvc",
 ]
-# Publish jobs to run in CI
+# Which actions to run on pull requests
 pr-run-mode = "plan"
 # A GitHub repo to push Homebrew formulas to
 tap = "Frazzer951/homebrew-futils"
@@ -59,6 +59,8 @@ tap = "Frazzer951/homebrew-futils"
 publish-jobs = ["homebrew"]
 # Whether to install an updater program
 install-updater = true
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
 
 # Config for 'cargo release'
 [workspace.metadata.release]
