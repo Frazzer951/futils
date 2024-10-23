@@ -22,7 +22,7 @@ path = "src/main.rs"
 anyhow        = "1.0"
 clap          = { version = "4.4", features = ["cargo"] }
 clap_complete = "4.4"
-fs-err        = "2.9"
+fs-err        = "3.0"
 serde         = { version = "1.0", features = ["derive"] }
 serde_json    = { version = "1.0", features = ["preserve_order"] }
 sqlparse      = "0.3"
