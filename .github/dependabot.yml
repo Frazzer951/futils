@@ -3,19 +3,21 @@ version: 2
 updates:
   - package-ecosystem: "cargo"
     directory: "/"
-    target-branch: "main"
     schedule:
       interval: "daily"
     allow:
       - dependency-type: "direct"
     commit-message:
       prefix: "chore:"
-    assignees:
-      - "frazzer951"
     groups:
       cargo:
         patterns:
           - "*"
+    versioning-strategy: "increase-if-necessary"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -25,9 +27,11 @@ updates:
       - dependency-type: "direct"
     commit-message:
       prefix: "chore:"
-    assignees:
-      - "frazzer951"
     groups:
       github-actions:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
